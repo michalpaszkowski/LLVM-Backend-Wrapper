@@ -63,7 +63,8 @@ extern "C" IBackend_Result *generateTargetCode(const char *Buf,
   TargetOptions Options;
   auto RM = Optional<Reloc::Model>();
   auto TheTargetMachine = Target->createTargetMachine(
-      Module->getTargetTriple(), "generic", "", Options, RM);
+      Module->getTargetTriple(), "generic", "", Options, Reloc::Model::PIC_,
+      CodeModel::Small, CodeGenOpt::None);
 
   Module->setDataLayout(TheTargetMachine->createDataLayout());
 
