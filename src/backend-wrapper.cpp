@@ -1,5 +1,5 @@
 #include "backend-wrapper.h"
-#include "llvm/ADT/Triple.h"
+//#include "llvm/ADT/Triple.h"
 #include "llvm/Analysis/TargetLibraryInfo.h"
 #include "llvm/CodeGen/LinkAllCodegenComponents.h"
 #include "llvm/CodeGen/MachineModuleInfo.h"
@@ -10,7 +10,7 @@
 #include "llvm/IR/Module.h"
 #include "llvm/IRReader/IRReader.h"
 #include "llvm/Support/SourceMgr.h"
-#include "llvm/Support/TargetRegistry.h"
+#include "llvm/MC/TargetRegistry.h"
 #include "llvm/Support/TargetSelect.h"
 #include "llvm/Support/ToolOutputFile.h"
 #include "llvm/Support/raw_ostream.h"
@@ -33,6 +33,7 @@ extern "C" IBackend_Result *generateTargetCode(const char *Buf,
   std::unique_ptr<MemoryBuffer> Buffer =
       MemoryBuffer::getMemBuffer(StringRef(Bitcode));
   LLVMContext Context;
+  Context.setOpaquePointers(false);
   SMDiagnostic ModuleError;
   std::unique_ptr<Module> Module =
       parseIR(Buffer->getMemBufferRef(), ModuleError, Context);
@@ -61,7 +62,7 @@ extern "C" IBackend_Result *generateTargetCode(const char *Buf,
   }
 
   TargetOptions Options;
-  auto RM = Optional<Reloc::Model>();
+  auto RM = std::optional<Reloc::Model>();
   auto TheTargetMachine = Target->createTargetMachine(
       Module->getTargetTriple(), "generic", "", Options, Reloc::Model::PIC_,
       CodeModel::Small, CodeGenOpt::None);
